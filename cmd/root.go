@@ -5,11 +5,13 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
 //notes for imports:
 //go get k8s.io/client-go@latest
+// go get k8s.io/client-go/plugin/pkg/client/auth/exec@v0.25.2
+// go get k8s.io/client-go/discovery@v0.25.2
+// go get k8s.io/client-go/tools/clientcmd@v0.25.2
 
 package cmd
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -34,7 +36,7 @@ var (
 		// Run: func(cmd *cobra.Command, args []string) { },
 
 	}
-	kubeconfig *string
+	kubeconfig string
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -54,20 +56,13 @@ func init() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-cli-fun.yaml)")
 	// var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
-		rootCmd.PersistentFlags().StringVarP(kubeconfig, "ptest", "p", "", "hi this is a test string")
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+		rootCmd.PersistentFlags().StringVarP(&kubeconfig, "kubeconfig", "k", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file (default is $HOME<OS specific Separator>.kube<OS specific Separator>config)")
 	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+		rootCmd.PersistentFlags().StringVarP(&kubeconfig, "kubeconfig", "k", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file (default is $HOME<OS specific Separator>.kube<OS specific Separator>config)")
+		rootCmd.MarkFlagRequired("kubeconfig")
 	}
 
-	// if home := homedir.HomeDir(); home != "" {
-	// 	kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	// } else {
-	// 	kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	// }
-	// flag.Parse()
-
-	fmt.Println(*kubeconfig)
+	fmt.Println(kubeconfig)
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	// Cobra also supports local flags, which will only run
